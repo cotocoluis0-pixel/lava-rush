@@ -101,11 +101,12 @@ function init3D(){
   const edge = new THREE.Mesh(new THREE.TorusGeometry(14.7,.18,8,64),new THREE.MeshStandardMaterial({color:0x8e82ff,emissive:0x4130a8,emissiveIntensity:1.2}));
   edge.rotation.x=Math.PI/2;edge.position.y=-2.55;scene.add(edge);
 
+  // Plataformas em alturas acessíveis a partir do chão.
   const platformData = [
-    [-8,1,-6,4,0.7,4],[-2,2,-8,3,0.7,3],[5,3,-7,4,0.7,3],
-    [9,1,-1,3,0.7,4],[5,4,4,4,0.7,4],[-1,2,7,4,0.7,3],
-    [-7,4,5,3,0.7,4],[-10,2,0,3,0.7,3],[1,5,0,3,0.7,3],
-    [-3,6,-3,2.8,0.7,2.8],[8,6,7,2.8,0.7,2.8]
+    [-8,-1.35,-6,4.4,0.7,4.4],[-2,-0.55,-8,3.8,0.7,3.8],[5,0.25,-7,4.2,0.7,3.8],
+    [9,-1.25,-1,3.8,0.7,4.2],[5,1.05,4,4.2,0.7,4.2],[-1,-0.45,7,4.2,0.7,3.8],
+    [-7,1.05,5,3.8,0.7,4.2],[-10,-0.65,0,3.8,0.7,3.8],[1,1.75,0,3.6,0.7,3.6],
+    [-3,2.45,-3,3.2,0.7,3.2],[8,2.45,7,3.2,0.7,3.2]
   ];
   platformData.forEach((d,i)=>{
     const [x,y,z,w,h,dep]=d;
@@ -122,7 +123,7 @@ function init3D(){
     rock.position.set(Math.cos(a)*r,Math.random()*9-2,Math.sin(a)*r);rock.rotation.set(Math.random()*3,Math.random()*3,Math.random()*3);scene.add(rock);
   }
   lavaMat=new THREE.MeshStandardMaterial({color:0xff4b19,emissive:0xff3510,emissiveIntensity:1.2,roughness:.32,metalness:.05});
-  lava=new THREE.Mesh(new THREE.CylinderGeometry(15.2,15.2,.35,48),lavaMat);lava.position.y=-2.5;scene.add(lava);
+  lava=new THREE.Mesh(new THREE.CylinderGeometry(15.2,15.2,.35,48),lavaMat);lava.position.y=-4.2;scene.add(lava);
   const glow=new THREE.PointLight(0xff4318,22,28);glow.position.set(0,-1,0);scene.add(glow);
 
   window.addEventListener("resize",()=>{
@@ -142,18 +143,33 @@ function init3D(){
 function ensurePlayer(p){
   if(playerMeshes.has(p.id))return;
   const group=new THREE.Group();
-  const mat=new THREE.MeshStandardMaterial({color:p.color,roughness:.55});
-  const dark=new THREE.MeshStandardMaterial({color:0x20243a,roughness:.8});
-  const torso=new THREE.Mesh(new THREE.BoxGeometry(.85,.9,.45),mat);torso.position.y=1.25;torso.castShadow=true;group.add(torso);
-  const head=new THREE.Mesh(new THREE.BoxGeometry(.62,.62,.62),new THREE.MeshStandardMaterial({color:0xffd1a8,roughness:.8}));head.position.y=2.05;head.castShadow=true;group.add(head);
-  const hair=new THREE.Mesh(new THREE.BoxGeometry(.66,.18,.66),dark);hair.position.y=2.39;group.add(hair);
-  for(const x of [-.23,.23]){
-    const leg=new THREE.Mesh(new THREE.BoxGeometry(.28,.65,.32),dark);leg.position.set(x,.47,0);leg.castShadow=true;group.add(leg);
-    const arm=new THREE.Mesh(new THREE.BoxGeometry(.25,.72,.3),mat);arm.position.set(x*2,1.3,0);arm.castShadow=true;group.add(arm);
+  const outfit=new THREE.MeshStandardMaterial({color:p.color,roughness:.48,metalness:.04});
+  const dark=new THREE.MeshStandardMaterial({color:0x20243a,roughness:.7});
+  const skin=new THREE.MeshStandardMaterial({color:0xffc69b,roughness:.72});
+  const accent=new THREE.MeshStandardMaterial({color:0xf7f7ff,roughness:.4,metalness:.08});
+  const addPart=(geo,mat,x,y,z,cast=true)=>{
+    const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);m.castShadow=cast;m.receiveShadow=true;group.add(m);return m;
+  };
+  // Avatar inspirado no estilo Roblox, com detalhes no rosto e roupas.
+  addPart(new THREE.BoxGeometry(.82,.82,.42),outfit,0,1.28,0);
+  addPart(new THREE.BoxGeometry(.58,.22,.44),accent,0,1.56,-.015,false);
+  addPart(new THREE.SphereGeometry(.34,20,16),skin,0,2.02,0);
+  addPart(new THREE.SphereGeometry(.345,18,10,0,Math.PI*2,0,Math.PI*.55),dark,0,2.16,-.015);
+  const eyeMat=new THREE.MeshStandardMaterial({color:0x202033,roughness:.3});
+  addPart(new THREE.SphereGeometry(.035,10,8),eyeMat,-.105,2.04,-.302,false);
+  addPart(new THREE.SphereGeometry(.035,10,8),eyeMat,.105,2.04,-.302,false);
+  addPart(new THREE.BoxGeometry(.12,.025,.018),new THREE.MeshStandardMaterial({color:0x9b4e43}),0,1.94,-.317,false);
+  for(const side of [-1,1]){
+    addPart(new THREE.CapsuleGeometry(.115,.43,4,8),outfit,side*.53,1.29,0);
+    addPart(new THREE.SphereGeometry(.125,12,10),skin,side*.53,.98,0);
+    addPart(new THREE.CapsuleGeometry(.14,.43,4,8),dark,side*.21,.53,0);
+    addPart(new THREE.BoxGeometry(.31,.16,.43),accent,side*.21,.27,-.065);
   }
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(.52,.025,6,24),new THREE.MeshBasicMaterial({color:p.color}));
+  ring.rotation.x=Math.PI/2;ring.position.y=.08;group.add(ring);
   scene.add(group);playerMeshes.set(p.id,group);
 }
-function jump(){if(!roomState||roomState.state!=="playing"||!myPlayer?.alive||!onGround)return;jumpVelocity=9.5;onGround=false}
+function jump(){if(!roomState||roomState.state!=="playing"||!myPlayer?.alive||!onGround)return;jumpVelocity=12.8;onGround=false}
 function animate(){
   requestAnimationFrame(animate);
   const dt=Math.min(clock.getDelta(),.04), t=clock.elapsedTime;
@@ -172,7 +188,7 @@ function animate(){
       let nx=mesh.position.x+dx*speed*dt, nz=mesh.position.z+dz*speed*dt;
       nx=Math.max(-13.5,Math.min(13.5,nx));nz=Math.max(-13.5,Math.min(13.5,nz));
       const prevY=mesh.position.y;
-      jumpVelocity-=22*dt;
+      jumpVelocity-=20*dt;
       let ny=prevY+jumpVelocity*dt;
       let landed=false;
       if(jumpVelocity<=0){
@@ -180,10 +196,10 @@ function animate(){
           const pos=p.mesh.position;
           if(nx>pos.x-p.w/2-.25&&nx<pos.x+p.w/2+.25&&nz>pos.z-p.dep/2-.25&&nz<pos.z+p.dep/2+.25){
             const top=pos.y+p.h/2;
-            if(prevY>=top-.1&&ny<=top+.08){ny=top;jumpVelocity=0;landed=true;break;}
+            if(prevY>=top-.22&&ny<=top+.12){ny=top;jumpVelocity=0;landed=true;break;}
           }
         }
-        if(!landed&&ny<=-2.25){ny=-2.25;jumpVelocity=0;landed=true;}
+        if(!landed&&ny<=-2.42){ny=-2.42;jumpVelocity=0;landed=true;}
       }
       onGround=landed;
       mesh.position.set(nx,ny,nz);

@@ -32,7 +32,7 @@ function emitRoom(room) {
 }
 function resetRound(room) {
   room.state = "waiting";
-  room.lavaY = -2.5;
+  room.lavaY = -4.2;
   room.timeLeft = 10;
   room.winner = null;
   for (const p of room.players.values()) {
@@ -62,7 +62,7 @@ function removePlayer(socket) {
 function startRound(room) {
   if (room.players.size < 1) return;
   room.state = "playing";
-  room.lavaY = -2.5;
+  room.lavaY = -4.2;
   room.timeLeft = 5;
   room.winner = null;
   for (const p of room.players.values()) {
@@ -87,7 +87,7 @@ io.on("connection", socket => {
   socket.on("room:create", ({ name }, reply = () => {}) => {
     removePlayer(socket);
     const code = makeCode();
-    const room = { code, players: new Map(), state: "waiting", lavaY: -2.5, timeLeft: 10, winner: null, timer: null };
+    const room = { code, players: new Map(), state: "waiting", lavaY: -4.2, timeLeft: 10, winner: null, timer: null };
     rooms.set(code, room);
     joinRoom(socket, room, name, reply);
     room.timer = setInterval(() => {
@@ -98,7 +98,7 @@ io.on("connection", socket => {
         else emitRoom(room);
       } else if (room.state === "playing") {
         room.timeLeft--;
-        room.lavaY += 0.045;
+        room.lavaY += 0.055;
         for (const p of room.players.values()) {
           if (p.alive && p.y < room.lavaY + 0.45) p.alive = false;
         }
