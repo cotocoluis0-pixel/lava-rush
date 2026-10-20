@@ -38,7 +38,7 @@ function resetRound(room) {
   for (const p of room.players.values()) {
     p.x = (Math.random() - 0.5) * 5;
     p.z = (Math.random() - 0.5) * 5;
-    p.y = 1.2;
+    p.y = -2.79;
     p.alive = true;
   }
   emitRoom(room);
@@ -68,7 +68,7 @@ function startRound(room) {
   for (const p of room.players.values()) {
     p.x = (Math.random() - 0.5) * 5;
     p.z = (Math.random() - 0.5) * 5;
-    p.y = 1.2;
+    p.y = -2.79;
     p.alive = true;
   }
   emitRoom(room);
@@ -146,7 +146,7 @@ io.on("connection", socket => {
 function joinRoom(socket, room, rawName, reply) {
   const name = String(rawName || "Jogador").trim().slice(0, 16) || "Jogador";
   const colors = ["#43c6ff", "#ffcf4a", "#ff6b8a", "#9d82ff", "#5de0a0", "#ff9955"];
-  const p = { id: socket.id, name, x: (Math.random() - .5) * 5, y: 1.2, z: (Math.random() - .5) * 5, color: colors[room.players.size % colors.length], alive: true };
+  const p = { id: socket.id, name, x: (Math.random() - .5) * 5, y: -2.79, z: (Math.random() - .5) * 5, color: colors[room.players.size % colors.length], alive: true };
   room.players.set(socket.id, p);
   socket.join(room.code);
   socket.data.roomCode = room.code;

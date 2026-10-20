@@ -191,15 +191,31 @@ function animate(){
       jumpVelocity-=20*dt;
       let ny=prevY+jumpVelocity*dt;
       let landed=false;
+      // Detect collisions using the bottom of the avatar's shoes.
+      const shoeOffset=0.19;
       if(jumpVelocity<=0){
         for(const p of platforms){
           const pos=p.mesh.position;
-          if(nx>pos.x-p.w/2-.25&&nx<pos.x+p.w/2+.25&&nz>pos.z-p.dep/2-.25&&nz<pos.z+p.dep/2+.25){
+          const insideX=nx>pos.x-p.w/2-.22&&nx<pos.x+p.w/2+.22;
+          const insideZ=nz>pos.z-p.dep/2-.22&&nz<pos.z+p.dep/2+.22;
+          if(insideX&&insideZ){
             const top=pos.y+p.h/2;
-            if(prevY>=top-.22&&ny<=top+.12){ny=top;jumpVelocity=0;landed=true;break;}
+            const previousFeet=prevY+shoeOffset;
+            const nextFeet=ny+shoeOffset;
+            if(previousFeet>=top-.08&&nextFeet<=top+.04){
+              ny=top-shoeOffset;
+              jumpVelocity=0;
+              landed=true;
+              break;
+            }
           }
         }
-        if(!landed&&ny<=-2.42){ny=-2.42;jumpVelocity=0;landed=true;}
+        // The arena floor top is -2.6.
+        if(!landed&&ny<=-2.79){
+          ny=-2.79;
+          jumpVelocity=0;
+          landed=true;
+        }
       }
       onGround=landed;
       mesh.position.set(nx,ny,nz);
