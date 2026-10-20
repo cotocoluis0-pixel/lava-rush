@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="theme-color" content="#11152a">
+  <title>Lava Rush — Sobreviva!</title>
+  <link rel="stylesheet" href="/style.css">
+  <script type="importmap">
+    {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js"}}
+  </script>
+</head>
+<body>
+  <div id="game"></div>
+  <div class="brand"><span class="brand-icon">🌋</span><div><b>LAVA RUSH</b><small>SOBREVIVA SE PUDER</small></div></div>
+  <div id="hud" class="hidden">
+    <div class="pill"><span>⏱</span> <b id="timer">--</b></div>
+    <div class="pill"><span>👥</span> <b id="count">1</b></div>
+    <div class="pill room-pill">SALA <b id="roomCodeHud">-----</b><button id="copyCode" aria-label="Copiar código">⧉</button></div>
+    <div id="status" class="status">Esperando jogadores...</div>
+    <div id="leaderboard" class="leaderboard"></div>
+  </div>
+
+  <section id="menu" class="menu-card">
+    <div class="eyebrow">MULTIPLAYER • 3D</div>
+    <h1>O chão virou <span>lava.</span></h1>
+    <p class="subtitle">Suba nas plataformas. Não caia. Seja o último sobrevivente.</p>
+    <label for="playerName">Seu nome</label>
+    <input id="playerName" maxlength="16" placeholder="Ex.: Luide" value="">
+    <button id="createRoom" class="primary">＋ Criar sala privada</button>
+    <div class="separator"><span>ou entrar com código</span></div>
+    <div class="join-row"><input id="roomCode" maxlength="5" placeholder="CÓDIGO" autocomplete="off"><button id="joinRoom">Entrar</button></div>
+    <div id="error" role="alert"></div>
+    <div class="howto"><b>Como jogar</b><p>PC: <kbd>W A S D</kbd> ou setas + <kbd>Espaço</kbd> para pular.</p><p>Celular: use o direcional e o botão de pulo.</p></div>
+    <div class="menu-footer">Crie uma sala e envie o código para seus amigos.</div>
+  </section>
+
+  <div id="mobileControls" class="hidden">
+    <div class="dpad">
+      <button data-dir="up">▲</button>
+      <div><button data-dir="left">◀</button><button data-dir="down">▼</button><button data-dir="right">▶</button></div>
+    </div>
+    <button id="jumpBtn" class="jump">PULAR</button>
+  </div>
+  <div id="toast"></div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="module" src="/client.js"></script>
+</body>
+</html>
