@@ -74,10 +74,19 @@ function startRound(room) {
   emitRoom(room);
 }
 function checkWinner(room) {
+  if (room.state !== "playing") return;
   const alive = [...room.players.values()].filter(p => p.alive);
-  if (alive.length <= 1 && room.state === "playing") {
+
+  // A winner is only declared when exactly one player remains alive.
+  // If everyone is eliminated together, the round ends with no winner.
+  if (alive.length === 1) {
     room.state = "finished";
-    room.winner = alive[0]?.name || "Ninguém";
+    room.winner = alive[0].name;
+    room.timeLeft = 8;
+    emitRoom(room);
+  } else if (alive.length === 0) {
+    room.state = "finished";
+    room.winner = null;
     room.timeLeft = 8;
     emitRoom(room);
   }
@@ -105,7 +114,7 @@ io.on("connection", socket => {
         if (room.timeLeft <= 0) {
           room.state = "finished";
           const alive = [...room.players.values()].filter(p => p.alive);
-          room.winner = alive[0]?.name || "Ninguém";
+          room.winner = alive.length === 1 ? alive[0].name : null;
           room.timeLeft = 8;
         }
         checkWinner(room);

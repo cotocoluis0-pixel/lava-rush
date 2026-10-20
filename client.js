@@ -48,7 +48,7 @@ socket.on("room:update", room => {
   $("timer").textContent = room.timeLeft + "s";
   $("roomCodeHud").textContent = room.code;
   const status = room.state === "waiting" ? `A rodada começa em ${room.timeLeft}s` :
-    room.state === "playing" ? "A LAVA ESTÁ SUBINDO!" : `🏆 ${room.winner} venceu!`;
+    room.state === "playing" ? "A LAVA ESTÁ SUBINDO!" : (room.winner ? `🏆 ${room.winner} venceu!` : "Rodada encerrada: ninguém venceu.");
   $("status").textContent = status;
   $("leaderboard").innerHTML = "";
   room.players.forEach(p => {
